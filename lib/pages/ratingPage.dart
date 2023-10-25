@@ -255,7 +255,7 @@ class _ratingPageState extends State<ratingPage> {
                           const Padding(
                               padding: EdgeInsets.symmetric(vertical: 30)),
                           Text(
-                            'Kindly rate the questions based on the following ratings.',
+                            'Kindly rate the questions based on the following ratings:',
                             style: TextStyle(
                                 shadows: List.filled(
                                     1,
@@ -273,9 +273,22 @@ class _ratingPageState extends State<ratingPage> {
                             height: 20,
                           ),
                           Container(
+                            height: 150,
+                            width: MediaQuery.of(context).size.width / 100 * 90,
+                            decoration: BoxDecoration(
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black,
+                                    blurRadius: 2.0,
+                                    spreadRadius: 0.0,
+                                    offset: Offset(1.0, 2.0),
+                                  )
+                                ],
+                                color: textColorBlack,
+                                borderRadius: BorderRadius.circular(25)),
                             alignment: Alignment.center,
                             child: Text(
-                              '⭐  - Not Satisfied ☹️\n⭐⭐  - Satisfied 😐\n⭐⭐⭐  - Good 🙂\n⭐⭐⭐⭐  - Very Good 😍',
+                              '⭐                 - Not Satisfied ☹️\n⭐⭐            - Satisfied 😐\n⭐⭐⭐       - Good 🙂\n⭐⭐⭐⭐  - Very Good 😍',
                               style: TextStyle(
                                   shadows: List.filled(
                                       2,
