@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:hits_rating/models/ratings.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -18,8 +19,8 @@ class ratingPage extends StatefulWidget {
 }
 
 class _ratingPageState extends State<ratingPage> {
-  final _snackBar = const SnackBar(
-    backgroundColor: Colors.black,
+  final _successSnackBar = const SnackBar(
+    backgroundColor: Color.fromARGB(255, 0, 184, 6),
     content: Text(
       'Thanks for the feedback!',
       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -27,6 +28,19 @@ class _ratingPageState extends State<ratingPage> {
     duration: Duration(seconds: 3),
     behavior: SnackBarBehavior.floating,
   );
+
+  final _errorSnackBar = const SnackBar(
+    backgroundColor: Color.fromARGB(255, 255, 0, 0),
+    content: Text(
+      'Oops!! I think you forgot to Rate.',
+      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+    ),
+    showCloseIcon: true,
+    duration: Duration(seconds: 4),
+    behavior: SnackBarBehavior.floating,
+    elevation: 5,
+  );
+
   final List<Rating> ratings = [];
   String suggestion = '';
   double rating1 = 0;
@@ -113,6 +127,7 @@ class _ratingPageState extends State<ratingPage> {
   Color textColorwhite = Colors.white;
   Color textColorBlack = Colors.black;
   String allowedText = '';
+  String permissionText = 'Ask permission';
 
   @override
   Widget build(BuildContext context) {
@@ -136,8 +151,9 @@ class _ratingPageState extends State<ratingPage> {
                         builder: (context) {
                           return AlertDialog(
                             title: const Text(
-                              'About this App:',
+                              'About this App',
                               style: TextStyle(fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
                             ),
                             content: const Text(
                               'This app will collect the ratings from the user and save it in this device\'s internal storage.\n\nSaved path: Internal storage > Documents > ratings.csv',
@@ -189,12 +205,13 @@ class _ratingPageState extends State<ratingPage> {
                                 fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
+                          const Padding(padding: EdgeInsets.only(top: 8)),
                           Text(
                             allowedText,
                             style: TextStyle(
-                                color: textColorBlack,
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold),
+                              color: textColorBlack,
+                              fontSize: 15,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                           const Padding(padding: EdgeInsets.only(top: 20)),
@@ -203,10 +220,10 @@ class _ratingPageState extends State<ratingPage> {
                                 _requestPermission();
                                 setState(() {
                                   allowedText =
-                                      '(Tap again to continue if you allowed)';
+                                      '(If you have granted permission, tap again to continue.)';
                                 });
                               },
-                              child: const Text('Ask permission'))
+                              child: Text(permissionText))
                         ],
                       ),
                     ),
@@ -214,17 +231,24 @@ class _ratingPageState extends State<ratingPage> {
                 }
                 return SingleChildScrollView(
                   child: Center(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width / 100 * 90,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
                           const Padding(
                               padding: EdgeInsets.symmetric(vertical: 10)),
-                          const Text(
-                            'OPEN HOUSE FEEDBACK',
+                          Text(
+                            'CAREER COMPASS FEEDBACK',
                             style: TextStyle(
+                                shadows: List.filled(
+                                    2,
+                                    Shadow(
+                                        color: Colors.black,
+                                        offset: Offset.fromDirection(1.1, 4),
+                                        blurRadius: 5),
+                                    growable: false),
                                 color: Colors.white,
-                                fontSize: 25,
+                                fontSize: 30,
                                 fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
@@ -233,8 +257,15 @@ class _ratingPageState extends State<ratingPage> {
                           Text(
                             'Kindly rate the questions based on the following ratings.',
                             style: TextStyle(
+                                shadows: List.filled(
+                                    1,
+                                    Shadow(
+                                        color: Colors.black,
+                                        offset: Offset.fromDirection(1.1, 3.3),
+                                        blurRadius: 5),
+                                    growable: false),
                                 color: textColorwhite,
-                                fontSize: 20,
+                                fontSize: 23,
                                 fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
@@ -244,8 +275,15 @@ class _ratingPageState extends State<ratingPage> {
                           Container(
                             alignment: Alignment.center,
                             child: Text(
-                              '⭐ - Not Satisfied ☹️\n⭐⭐ - Satisfied 😐\n⭐⭐⭐ - Good 🙂\n⭐⭐⭐⭐  - Very Good 😁',
+                              '⭐  - Not Satisfied ☹️\n⭐⭐  - Satisfied 😐\n⭐⭐⭐  - Good 🙂\n⭐⭐⭐⭐  - Very Good 😍',
                               style: TextStyle(
+                                  shadows: List.filled(
+                                      2,
+                                      Shadow(
+                                          color: Colors.black,
+                                          offset: Offset.fromDirection(1.1, 1),
+                                          blurRadius: 5),
+                                      growable: false),
                                   color: textColorwhite,
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold),
@@ -254,184 +292,274 @@ class _ratingPageState extends State<ratingPage> {
                           ),
                           const Padding(
                               padding: EdgeInsets.symmetric(vertical: 10)),
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                color: textColorwhite,
-                                borderRadius: BorderRadius.circular(25)),
-                            child: Column(
-                              children: [
-                                Text(
-                                  'Were your expectation met in the Hindustan Open House?',
-                                  style: TextStyle(
-                                      color: textColorBlack,
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold),
-                                  textAlign: TextAlign.center,
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  height: 70,
-                                  child: RatingBar.builder(
-                                    initialRating: rating1,
-                                    minRating: 1,
-                                    direction: Axis.horizontal,
-                                    itemCount: 4,
-                                    itemPadding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    itemBuilder: (context, _) => const Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                    ),
-                                    onRatingUpdate: (rating) {
-                                      rating1 = rating;
-                                      // Store the rating in a variable here
-                                    },
+                          Material(
+                            borderRadius: BorderRadius.circular(25),
+                            elevation: 10,
+                            child: Container(
+                              height: 150,
+                              width:
+                                  MediaQuery.of(context).size.width / 100 * 90,
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black,
+                                      blurRadius: 2.0,
+                                      spreadRadius: 0.0,
+                                      offset: Offset(1.0, 2.0),
+                                    )
+                                  ],
+                                  color: textColorwhite,
+                                  borderRadius: BorderRadius.circular(25)),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    'Expectations met in the Career Compass?',
+                                    style: TextStyle(
+                                        color: textColorBlack,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-                              ],
+                                  Container(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    height: 70,
+                                    child: RatingBar.builder(
+                                      itemSize: 44,
+                                      unratedColor: Colors.blueGrey,
+                                      initialRating: rating1,
+                                      minRating: 1,
+                                      direction: Axis.horizontal,
+                                      itemCount: 4,
+                                      itemPadding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      itemBuilder: (context, _) => const Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                      ),
+                                      onRatingUpdate: (rating) {
+                                        rating1 = rating;
+                                        // Store the rating in a variable here
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           const Padding(
                               padding: EdgeInsets.symmetric(vertical: 10)),
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(25)),
-                            child: Column(
-                              children: [
-                                const Text(
-                                  'Did you learn about various career options?',
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold),
-                                  textAlign: TextAlign.center,
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  height: 70,
-                                  child: RatingBar.builder(
-                                    initialRating: rating2,
-                                    minRating: 1,
-                                    direction: Axis.horizontal,
-                                    itemCount: 4,
-                                    itemPadding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    itemBuilder: (context, _) => const Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                    ),
-                                    onRatingUpdate: (rating) {
-                                      rating2 = rating;
-                                      // Store the rating in a variable here
-                                    },
+                          Material(
+                            borderRadius: BorderRadius.circular(25),
+                            elevation: 10,
+                            child: Container(
+                              height: 150,
+                              width:
+                                  MediaQuery.of(context).size.width / 100 * 90,
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black,
+                                      blurRadius: 2.0,
+                                      spreadRadius: 0.0,
+                                      offset: Offset(1.0, 2.0),
+                                    )
+                                  ],
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(25)),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  const Text(
+                                    'Learn about various career options?',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-                              ],
+                                  Container(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    height: 70,
+                                    child: RatingBar.builder(
+                                      unratedColor: Colors.blueGrey,
+                                      initialRating: rating2,
+                                      minRating: 1,
+                                      itemSize: 44,
+                                      direction: Axis.horizontal,
+                                      itemCount: 4,
+                                      itemPadding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      itemBuilder: (context, _) => const Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                      ),
+                                      onRatingUpdate: (rating) {
+                                        rating2 = rating;
+                                        // Store the rating in a variable here
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           const Padding(
                               padding: EdgeInsets.symmetric(vertical: 10)),
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(25)),
-                            child: Column(
-                              children: [
-                                const Text(
-                                  'Kindly rate about overall Hindustan Open House experience.',
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold),
-                                  textAlign: TextAlign.center,
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  height: 70,
-                                  child: RatingBar.builder(
-                                    initialRating: rating3,
-                                    minRating: 1,
-                                    direction: Axis.horizontal,
-                                    itemCount: 4,
-                                    itemPadding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    itemBuilder: (context, _) => const Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                    ),
-                                    onRatingUpdate: (rating) {
-                                      rating3 = rating;
-                                    },
+                          Material(
+                            borderRadius: BorderRadius.circular(25),
+                            elevation: 10,
+                            child: Container(
+                              height: 150,
+                              width:
+                                  MediaQuery.of(context).size.width / 100 * 90,
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black,
+                                      blurRadius: 2.0,
+                                      spreadRadius: 0.0,
+                                      offset: Offset(1.0, 2.0),
+                                    )
+                                  ],
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(25)),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  const Text(
+                                    'Overall Career Compass experience?',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-                              ],
+                                  Container(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    height: 70,
+                                    child: RatingBar.builder(
+                                      unratedColor: Colors.blueGrey,
+                                      initialRating: rating3,
+                                      minRating: 1,
+                                      direction: Axis.horizontal,
+                                      itemCount: 4,
+                                      itemSize: 44,
+                                      itemPadding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      itemBuilder: (context, _) => const Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                      ),
+                                      onRatingUpdate: (rating) {
+                                        rating3 = rating;
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           const Padding(
                               padding: EdgeInsets.symmetric(vertical: 10)),
                           Text(
-                            'Suggestions if any:',
+                            'Any suggestions?',
                             style: TextStyle(
+                                shadows: List.filled(
+                                    2,
+                                    Shadow(
+                                        color: Colors.black,
+                                        offset: Offset.fromDirection(1.1, 3),
+                                        blurRadius: 5),
+                                    growable: false),
                                 color: textColorwhite,
-                                fontSize: 17,
+                                fontSize: 19,
                                 fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(
                             height: 10,
                           ),
-                          Container(
-                            height: 120,
-                            padding: const EdgeInsets.all(7),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Colors.white,
-                            ),
-                            child: TextField(
-                              minLines: null,
-                              maxLines: null,
-                              expands: true,
-                              style: const TextStyle(fontSize: 15),
-                              decoration: const InputDecoration.collapsed(
-                                  hintText: 'Type here...',
-                                  hintStyle: TextStyle(fontSize: 12)),
-                              keyboardType: TextInputType.text,
-                              onChanged: (value) {
-                                suggestion = value;
-                              },
+                          Material(
+                            borderRadius: BorderRadius.circular(25),
+                            elevation: 10,
+                            child: Container(
+                              width:
+                                  MediaQuery.of(context).size.width / 100 * 90,
+                              height: 150,
+                              padding: const EdgeInsets.all(18),
+                              decoration: BoxDecoration(
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black,
+                                    blurRadius: 2.0,
+                                    spreadRadius: 0.0,
+                                    offset: Offset(1.0, 2.0),
+                                  )
+                                ],
+                                borderRadius: BorderRadius.circular(25),
+                                color: Colors.white,
+                              ),
+                              child: TextField(
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(100)
+                                ],
+                                minLines: null,
+                                maxLines: null,
+                                expands: true,
+                                style: const TextStyle(fontSize: 15),
+                                decoration: const InputDecoration.collapsed(
+                                    hintText: 'Type here...',
+                                    hintStyle: TextStyle(fontSize: 14)),
+                                keyboardType: TextInputType.text,
+                                onChanged: (value) {
+                                  suggestion = value;
+                                },
+                              ),
                             ),
                           ),
                           const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 30)),
+                              padding: EdgeInsets.symmetric(vertical: 25)),
                           SizedBox(
-                            width: MediaQuery.of(context).size.width / 100 * 65,
-                            height: 45,
+                            width: MediaQuery.of(context).size.width / 100 * 70,
+                            height: 50,
                             child: ElevatedButton(
                                 style: ButtonStyle(
+                                    elevation: MaterialStateProperty.all(20),
                                     backgroundColor:
                                         MaterialStateColor.resolveWith(
-                                            (states) => Colors.black)),
+                                            (states) => Colors.amber)),
                                 onPressed: () {
-                                  _submitRating();
-                                  Future.delayed(const Duration(seconds: 1),
-                                      () {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      PageRouteBuilder(
-                                        transitionDuration: Duration.zero,
-                                        pageBuilder: (_, __, ___) =>
-                                            const ratingPage(),
-                                      ),
-                                    );
-                                  });
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(_snackBar);
+                                  if (rating1 != 0 &&
+                                      rating2 != 0 &&
+                                      rating3 != 0) {
+                                    _submitRating();
+                                    Future.delayed(
+                                        const Duration(milliseconds: 200), () {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        PageRouteBuilder(
+                                          transitionDuration: Duration.zero,
+                                          pageBuilder: (_, __, ___) =>
+                                              const ratingPage(),
+                                        ),
+                                      );
+                                    });
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(_successSnackBar);
+                                  } else {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(_errorSnackBar);
+                                  }
                                 },
                                 child: const Text(
                                   'Submit',
                                   style: TextStyle(
-                                      color: Colors.white,
+                                      fontSize: 20,
+                                      color: Colors.black,
                                       fontWeight: FontWeight.bold),
                                 )),
                           ),

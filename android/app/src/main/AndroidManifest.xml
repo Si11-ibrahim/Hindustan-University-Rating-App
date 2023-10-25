@@ -5,7 +5,7 @@
 
 
     <application
-        android:label="Open House Rating"
+        android:label="Career Compass Rating"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
